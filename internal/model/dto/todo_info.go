@@ -1,9 +1,8 @@
-package model
+package dto
 
 type TodoList struct {
-	Id      int    `json:"id"`
 	Title   string `json:"title"`
 	Context string `json:"context"`
-	Status  bool   `json:"status"`
+	Status  string `json:"status"`
 	EndDate string `json:"end_date"`
 }

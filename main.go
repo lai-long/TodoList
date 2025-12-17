@@ -4,6 +4,7 @@ import (
 	"TodoList/pkg/database"
 	"TodoList/router"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
