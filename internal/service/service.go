@@ -6,6 +6,7 @@ import (
 	"TodoList/internal/responsibility"
 	"TodoList/pkg/database"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,7 +59,7 @@ func ShowAllList(c *gin.Context) {
 func ShowFinishedList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
-	err = database.DB.Where("status=?", "完成").Find(&todo).Error
+	err = database.DB.Where("status=?", "已完成").Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -92,4 +93,70 @@ func ShowWaitList(c *gin.Context) {
 			"data": todoList,
 		})
 	}
+}
+func OneUpdateToFinished(c *gin.Context) {
+	id := c.Params.ByName("id")
+	var todoInfo dto.TodoList
+	var todo entity.Todo
+	todo.Model.UpdatedAt = time.Now()
+	todo.Status = "已完成"
+	database.DB.Model(&todo).Where("id=?", id).Updates(todo)
+	todoInfo = responsibility.ExchangeTodoInfo(todo)
+	c.JSON(200, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": todoInfo.Status,
+	})
+
+}
+func OneUpdateToWait(c *gin.Context) {
+	id := c.Params.ByName("id")
+	var todoInfo dto.TodoList
+	var todo entity.Todo
+	todo.Model.UpdatedAt = time.Now()
+	todo.Status = "未完成"
+	database.DB.Model(&todo).Where("id=?", id).Updates(todo)
+	todoInfo = responsibility.ExchangeTodoInfo(todo)
+	c.JSON(200, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": todoInfo.Status,
+	})
+}
+
+func AllUpdateToFinished(c *gin.Context) {
+	var todo []entity.Todo
+	var todoInfo []dto.TodoList
+	database.DB.Where("status =?", "未完成").Find(&todo)
+	length := len(todo)
+	todoInfo = make([]dto.TodoList, length)
+	for i := 0; i < length; i++ {
+		todo[i].Model.UpdatedAt = time.Now()
+		todo[i].Status = "已完成"
+		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
+		todoInfo[i] = responsibility.ExchangeTodoInfo(todo[i])
+	}
+	c.JSON(200, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": todoInfo,
+	})
+}
+func AllUpdateToWait(c *gin.Context) {
+	var todo []entity.Todo
+	var todoInfo []dto.TodoList
+	database.DB.Where("status =?", "已完成").Find(&todo)
+	length := len(todo)
+	todoInfo = make([]dto.TodoList, length)
+	for i := 0; i < length; i++ {
+		todo[i].Model.UpdatedAt = time.Now()
+		todo[i].Status = "未完成"
+		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
+		todoInfo[i] = responsibility.ExchangeTodoInfo(todo[i])
+	}
+	c.JSON(200, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": todoInfo,
+	})
 }

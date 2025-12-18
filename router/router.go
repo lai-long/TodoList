@@ -9,14 +9,14 @@ import (
 func SetRouters(r *gin.Engine) {
 	//增加一条待办事项
 	r.POST("/memo/wait/add", service.CreateNewList)
-	//将一条设置为已完成
-	r.PUT("/memo/wait/:id")
-	//将所有设置为已完成
-	r.PUT("/memo/wait/all")
+	//将一条待办设置为已完成
+	r.PUT("/memo/wait/:id", service.OneUpdateToFinished)
+	//将所有待办设置为已完成
+	r.PUT("/memo/wait/all", service.AllUpdateToFinished)
 	//将一条已完成设置为待办
-	r.PUT("/memo/finished/:id")
+	r.PUT("/memo/finished/:id", service.OneUpdateToWait)
 	//将所有已完成设置为代办
-	r.PUT("/memo/finished/all")
+	r.PUT("/memo/finished/all", service.AllUpdateToWait)
 	//查已完成
 	r.GET("/memo/finished/all", service.ShowFinishedList)
 	//查未完成
