@@ -36,10 +36,48 @@ func CreateNewList(c *gin.Context) {
 		})
 	}
 }
-func ShowList(c *gin.Context) {
+func ShowAllList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
 	err = database.DB.Find(&todo).Error
+	todoList = responsibility.ExchangeTodoInfos(todo)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+			"error":   err,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 200,
+			"msg":  "success",
+			"data": todoList,
+		})
+	}
+}
+func ShowFinishedList(c *gin.Context) {
+	var todo []entity.Todo
+	var todoList []dto.TodoList
+	err = database.DB.Where("status=?", "完成").Find(&todo).Error
+	todoList = responsibility.ExchangeTodoInfos(todo)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+			"error":   err,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 200,
+			"msg":  "success",
+			"data": todoList,
+		})
+	}
+}
+func ShowWaitList(c *gin.Context) {
+	var todo []entity.Todo
+	var todoList []dto.TodoList
+	err = database.DB.Where("status=?", "未完成").Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{

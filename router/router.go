@@ -18,11 +18,11 @@ func SetRouters(r *gin.Engine) {
 	//将所有已完成设置为代办
 	r.PUT("/memo/finished/all")
 	//查已完成
-	r.GET("/memo/finished/all")
+	r.GET("/memo/finished/all", service.ShowFinishedList)
 	//查未完成
-	r.GET("/memo/wait/all")
+	r.GET("/memo/wait/all", service.ShowWaitList)
 	//查所有
-	r.GET("/memo/all", service.ShowList)
+	r.GET("/memo/all", service.ShowAllList)
 	//删一条已完成
 	r.DELETE("/memo/finished/:id")
 	//删所有已完成、
