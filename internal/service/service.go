@@ -183,3 +183,18 @@ func ShowByKeyword(c *gin.Context) {
 		"data": todoList,
 	})
 }
+func DropOne(c *gin.Context) {
+	id := c.Params.ByName("id")
+	if err = database.DB.Where("id=?", id).Delete(entity.Todo{}).Error; err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+			"error":   err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "success",
+		})
+	}
+}

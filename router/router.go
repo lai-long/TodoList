@@ -26,11 +26,11 @@ func SetRouters(r *gin.Engine) {
 	//根据关键词查＋?keyword=
 	r.GET("/search", service.ShowByKeyword)
 	//删一条已完成
-	r.DELETE("/memo/finished/:id")
+	r.DELETE("/memo/finished/:id", service.DropOne)
 	//删所有已完成、
 	r.DELETE("/memo/finished/all")
 	//删一条代办
-	r.DELETE("/memo/wait/:id")
+	r.DELETE("/memo/wait/:id", service.DropOne)
 	//删所有待办
 	r.DELETE("/memo/wait/all")
 	//删所有
