@@ -23,6 +23,8 @@ func SetRouters(r *gin.Engine) {
 	r.GET("/memo/wait/all", service.ShowWaitList)
 	//查所有
 	r.GET("/memo/all", service.ShowAllList)
+	//根据关键词查＋?keyword=
+	r.GET("/search", service.ShowByKeyword)
 	//删一条已完成
 	r.DELETE("/memo/finished/:id")
 	//删所有已完成、
