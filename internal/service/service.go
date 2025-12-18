@@ -37,6 +37,7 @@ func CreateNewList(c *gin.Context) {
 		})
 	}
 }
+
 func ShowAllList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
@@ -56,6 +57,7 @@ func ShowAllList(c *gin.Context) {
 		})
 	}
 }
+
 func ShowFinishedList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
@@ -75,6 +77,7 @@ func ShowFinishedList(c *gin.Context) {
 		})
 	}
 }
+
 func ShowWaitList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
@@ -94,6 +97,7 @@ func ShowWaitList(c *gin.Context) {
 		})
 	}
 }
+
 func OneUpdateToFinished(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -109,6 +113,7 @@ func OneUpdateToFinished(c *gin.Context) {
 	})
 
 }
+
 func OneUpdateToWait(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -142,6 +147,7 @@ func AllUpdateToFinished(c *gin.Context) {
 		"data": todoInfo,
 	})
 }
+
 func AllUpdateToWait(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
@@ -158,5 +164,22 @@ func AllUpdateToWait(c *gin.Context) {
 		"code": 200,
 		"msg":  "success",
 		"data": todoInfo,
+	})
+}
+
+func ShowByKeyword(c *gin.Context) {
+	word := c.Query("keyword")
+	var todo []entity.Todo
+	database.DB.Where("title LIKE?", "%"+word+"%").Or("context LIKE?", "%"+word+"%").Find(&todo)
+	var todoList []dto.TodoList
+	length := len(todo)
+	todoList = make([]dto.TodoList, length)
+	for i := 0; i < length; i++ {
+		todoList[i] = responsibility.ExchangeTodoInfo(todo[i])
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg":  "success",
+		"data": todoList,
 	})
 }

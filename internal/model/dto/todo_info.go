@@ -1,7 +1,7 @@
 package dto
 
 type TodoList struct {
-	Id      int
+	Id      int    `json:"-"`
 	Title   string `json:"title"`
 	Context string `json:"context"`
 	Status  string `json:"status"`
