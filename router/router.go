@@ -1,12 +1,14 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"TodoList/internal/service"
+
+	"github.com/gin-gonic/gin"
+)
 
 func SetRouters(r *gin.Engine) {
 	//增加一条待办事项
-	r.POST("/memo/wait/add", func(c *gin.Context) {
-
-	})
+	r.POST("/memo/wait/add", service.CreateNewList)
 	//将一条设置为已完成
 	r.PUT("/memo/wait/:id")
 	//将所有设置为已完成
