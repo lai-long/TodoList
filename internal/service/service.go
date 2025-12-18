@@ -198,3 +198,32 @@ func DropOne(c *gin.Context) {
 		})
 	}
 }
+
+func DropAllFinished(c *gin.Context) {
+	if err = database.DB.Where("status = ?", "已完成").DropTable(entity.Todo{}).Error; err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+			"error":   err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "success",
+		})
+	}
+}
+func DropAllWait(c *gin.Context) {
+	if err = database.DB.Where("status = ?", "未完成").DropTable(entity.Todo{}).Error; err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+			"error":   err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "success",
+		})
+	}
+}

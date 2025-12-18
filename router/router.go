@@ -28,13 +28,13 @@ func SetRouters(r *gin.Engine) {
 	//删一条已完成
 	r.DELETE("/memo/finished/:id", service.DropOne)
 	//删所有已完成、
-	r.DELETE("/memo/finished/all")
+	r.DELETE("/memo/finished/all", service.DropAllFinished)
 	//删一条代办
 	r.DELETE("/memo/wait/:id", service.DropOne)
 	//删所有待办
-	r.DELETE("/memo/wait/all")
+	r.DELETE("/memo/wait/all", service.DropAllWait)
 	//删所有
-	r.DELETE("/memo/all")
+	r.DELETE("/memo/all", service.DropAllWait, service.DropAllFinished)
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code": 404,
