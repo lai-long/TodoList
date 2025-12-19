@@ -1,9 +1,8 @@
 package dto
 
 type UserInfo struct {
-	ID       int
-	UserName string `json:"username"`
-	Password string `json:"password"`
+	UserName string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Sex      string `json:"sex"`
