@@ -7,6 +7,7 @@ import (
 	"TodoList/internal/responsibility"
 	"TodoList/pkg/database"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,12 +41,15 @@ func CreateNewList(c *gin.Context) {
 		})
 	}
 }
-
 func ShowAllList(c *gin.Context) {
+	offset := GetOffset(c)
+	_, pagesize := GetPage(c)
 	var todo []entity.Todo
 	var todoList []dto.TodoList
 	username := middleware.GetUsername(c)
-	err = database.DB.Where("username = ? ", username).Find(&todo).Error
+	var count int64
+	database.DB.Where("username = ? ", username).Count(&count)
+	err = database.DB.Offset(offset).Limit(pagesize).Where("username = ? ", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -55,19 +59,24 @@ func ShowAllList(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"code": 200,
-			"msg":  "success",
-			"data": todoList,
+			"code":  200,
+			"msg":   "success",
+			"data":  todoList,
+			"total": count,
+			"page":  1 + offset,
 		})
 	}
 }
-
 func ShowFinishedList(c *gin.Context) {
+	offset := GetOffset(c)
+	_, pagesize := GetPage(c)
 	var todo []entity.Todo
 	var todoList []dto.TodoList
 	username := middleware.GetUsername(c)
-	err = database.DB.Where("status=? AND username=?", "已完成", username).Find(&todo).Error
+	err = database.DB.Offset(offset).Limit(pagesize).Where("status=? AND username=?", "已完成", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
+	var count int64
+	database.DB.Where("username = ? ", username).Count(&count)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
@@ -76,19 +85,24 @@ func ShowFinishedList(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"code": 200,
-			"msg":  "success",
-			"data": todoList,
+			"code":  200,
+			"msg":   "success",
+			"data":  todoList,
+			"total": count,
+			"page":  1 + offset,
 		})
 	}
 }
-
 func ShowWaitList(c *gin.Context) {
+	offset := GetOffset(c)
+	_, pagesize := GetPage(c)
 	var todo []entity.Todo
 	var todoList []dto.TodoList
 	username := middleware.GetUsername(c)
-	err = database.DB.Where("status=? And username=?", "未完成", username).Find(&todo).Error
+	err = database.DB.Offset(offset).Limit(pagesize).Where("status=? And username=?", "未完成", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
+	var count int64
+	database.DB.Where("username = ? ", username).Count(&count)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
@@ -97,13 +111,14 @@ func ShowWaitList(c *gin.Context) {
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"code": 200,
-			"msg":  "success",
-			"data": todoList,
+			"code":  200,
+			"msg":   "success",
+			"data":  todoList,
+			"total": count,
+			"page":  1 + offset,
 		})
 	}
 }
-
 func OneUpdateToFinished(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -120,7 +135,6 @@ func OneUpdateToFinished(c *gin.Context) {
 	})
 
 }
-
 func OneUpdateToWait(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -136,7 +150,6 @@ func OneUpdateToWait(c *gin.Context) {
 		"data": todoInfo.Status,
 	})
 }
-
 func AllUpdateToFinished(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
@@ -156,7 +169,6 @@ func AllUpdateToFinished(c *gin.Context) {
 		"data": todoInfo,
 	})
 }
-
 func AllUpdateToWait(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
@@ -176,12 +188,15 @@ func AllUpdateToWait(c *gin.Context) {
 		"data": todoInfo,
 	})
 }
-
 func ShowByKeyword(c *gin.Context) {
+	offset := GetOffset(c)
+	_, pagesize := GetPage(c)
 	username := middleware.GetUsername(c)
 	word := c.Query("keyword")
 	var todo []entity.Todo
-	database.DB.Where("title LIKE? AND username=?", "%"+word+"%", username).Or("context LIKE? AND username=?", "%"+word+"%", username).Find(&todo)
+	database.DB.Offset(offset).Limit(pagesize).Where("title LIKE? AND username=?", "%"+word+"%", username).Or("context LIKE? AND username=?", "%"+word+"%", username).Find(&todo)
+	var count int64
+	database.DB.Where("title LIKE? AND username=?", "%"+word+"%", username).Or("context LIKE? AND username=?", "%"+word+"%", username).Count(&count)
 	var todoList []dto.TodoList
 	length := len(todo)
 	todoList = make([]dto.TodoList, length)
@@ -189,9 +204,11 @@ func ShowByKeyword(c *gin.Context) {
 		todoList[i] = responsibility.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"msg":  "success",
-		"data": todoList,
+		"code":  200,
+		"msg":   "success",
+		"data":  todoList,
+		"total": count,
+		"page":  1 + offset,
 	})
 }
 func DropOne(c *gin.Context) {
@@ -210,7 +227,6 @@ func DropOne(c *gin.Context) {
 		})
 	}
 }
-
 func DropAllFinished(c *gin.Context) {
 	username := middleware.GetUsername(c)
 	if err = database.DB.Where("status = ? AND username=?", "已完成", username).DropTable(entity.Todo{}).Error; err != nil {
@@ -240,4 +256,14 @@ func DropAllWait(c *gin.Context) {
 			"msg":  "success",
 		})
 	}
+}
+func GetPage(c *gin.Context) (page int, pageSize int) {
+	page, _ = strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ = strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	return page, pageSize
+}
+func GetOffset(c *gin.Context) int {
+	page, pageSize := GetPage(c)
+	offset := (page - 1) * pageSize
+	return offset
 }
