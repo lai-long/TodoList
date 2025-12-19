@@ -28,3 +28,7 @@ func AuthConfirm(c *gin.Context) {
 	c.Set("username", claims["username"])
 	c.Next()
 }
+func GetUsername(c *gin.Context) string {
+	username := c.GetString("username")
+	return username
+}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"TodoList/internal/middleware"
 	"TodoList/internal/model/dto"
 	"TodoList/internal/model/entity"
 	"TodoList/internal/responsibility"
@@ -23,6 +24,8 @@ func CreateNewList(c *gin.Context) {
 		})
 	}
 	todo := responsibility.ExchangeTodo(todoInfo)
+	username := middleware.GetUsername(c)
+	todo.UserName = username
 	if err = responsibility.SaveTodo(todo); err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
@@ -41,7 +44,8 @@ func CreateNewList(c *gin.Context) {
 func ShowAllList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
-	err = database.DB.Find(&todo).Error
+	username := middleware.GetUsername(c)
+	err = database.DB.Where("username = ? ", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -61,7 +65,8 @@ func ShowAllList(c *gin.Context) {
 func ShowFinishedList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
-	err = database.DB.Where("status=?", "已完成").Find(&todo).Error
+	username := middleware.GetUsername(c)
+	err = database.DB.Where("status=? AND username=?", "已完成", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -81,7 +86,8 @@ func ShowFinishedList(c *gin.Context) {
 func ShowWaitList(c *gin.Context) {
 	var todo []entity.Todo
 	var todoList []dto.TodoList
-	err = database.DB.Where("status=?", "未完成").Find(&todo).Error
+	username := middleware.GetUsername(c)
+	err = database.DB.Where("status=? And username=?", "未完成", username).Find(&todo).Error
 	todoList = responsibility.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -104,7 +110,8 @@ func OneUpdateToFinished(c *gin.Context) {
 	var todo entity.Todo
 	todo.Model.UpdatedAt = time.Now()
 	todo.Status = "已完成"
-	database.DB.Model(&todo).Where("id=?", id).Updates(todo)
+	username := middleware.GetUsername(c)
+	database.DB.Model(&todo).Where("id=? AND username=?", id, username).Updates(todo)
 	todoInfo = responsibility.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -120,7 +127,8 @@ func OneUpdateToWait(c *gin.Context) {
 	var todo entity.Todo
 	todo.Model.UpdatedAt = time.Now()
 	todo.Status = "未完成"
-	database.DB.Model(&todo).Where("id=?", id).Updates(todo)
+	username := middleware.GetUsername(c)
+	database.DB.Model(&todo).Where("id=? AND username=?", id, username).Updates(todo)
 	todoInfo = responsibility.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -132,7 +140,8 @@ func OneUpdateToWait(c *gin.Context) {
 func AllUpdateToFinished(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
-	database.DB.Where("status =?", "未完成").Find(&todo)
+	username := middleware.GetUsername(c)
+	database.DB.Where("status =? AND username = ?", "未完成", username).Find(&todo)
 	length := len(todo)
 	todoInfo = make([]dto.TodoList, length)
 	for i := 0; i < length; i++ {
@@ -151,7 +160,8 @@ func AllUpdateToFinished(c *gin.Context) {
 func AllUpdateToWait(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
-	database.DB.Where("status =?", "已完成").Find(&todo)
+	username := middleware.GetUsername(c)
+	database.DB.Where("status =? AND username=?", "已完成", username).Find(&todo)
 	length := len(todo)
 	todoInfo = make([]dto.TodoList, length)
 	for i := 0; i < length; i++ {
@@ -168,9 +178,10 @@ func AllUpdateToWait(c *gin.Context) {
 }
 
 func ShowByKeyword(c *gin.Context) {
+	username := middleware.GetUsername(c)
 	word := c.Query("keyword")
 	var todo []entity.Todo
-	database.DB.Where("title LIKE?", "%"+word+"%").Or("context LIKE?", "%"+word+"%").Find(&todo)
+	database.DB.Where("title LIKE? AND username=?", "%"+word+"%", username).Or("context LIKE? AND username=?", "%"+word+"%", username).Find(&todo)
 	var todoList []dto.TodoList
 	length := len(todo)
 	todoList = make([]dto.TodoList, length)
@@ -184,8 +195,9 @@ func ShowByKeyword(c *gin.Context) {
 	})
 }
 func DropOne(c *gin.Context) {
+	username := middleware.GetUsername(c)
 	id := c.Params.ByName("id")
-	if err = database.DB.Where("id=?", id).Delete(entity.Todo{}).Error; err != nil {
+	if err = database.DB.Where("id=? And username=?", id, username).Delete(entity.Todo{}).Error; err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
 			"message": "fail",
@@ -200,7 +212,8 @@ func DropOne(c *gin.Context) {
 }
 
 func DropAllFinished(c *gin.Context) {
-	if err = database.DB.Where("status = ?", "已完成").DropTable(entity.Todo{}).Error; err != nil {
+	username := middleware.GetUsername(c)
+	if err = database.DB.Where("status = ? AND username=?", "已完成", username).DropTable(entity.Todo{}).Error; err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
 			"message": "fail",
@@ -214,7 +227,8 @@ func DropAllFinished(c *gin.Context) {
 	}
 }
 func DropAllWait(c *gin.Context) {
-	if err = database.DB.Where("status = ?", "未完成").DropTable(entity.Todo{}).Error; err != nil {
+	username := middleware.GetUsername(c)
+	if err = database.DB.Where("status = ? AND username=?", "未完成", username).DropTable(entity.Todo{}).Error; err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
 			"message": "fail",
