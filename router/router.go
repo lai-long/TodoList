@@ -11,41 +11,41 @@ import (
 func SetRouters(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	{
-		//注册
+		//注册1
 		userGroup.POST("/register", controlller.Register)
-		//登录
+		//登录2
 		userGroup.POST("/login", controlller.Login)
 	}
 	memoGroup := r.Group("/memo", middleware.AuthConfirm)
 	{
-		//增加一条待办事项
+		//增加一条待办事项3
 		memoGroup.POST("/wait/add", service.CreateNewList)
-		//将一条待办设置为已完成
+		//将一条待办设置为已完成4
 		memoGroup.PUT("/wait/:id", service.OneUpdateToFinished)
-		//将所有待办设置为已完成
+		//将所有待办设置为已完成5
 		memoGroup.PUT("/wait/all", service.AllUpdateToFinished)
-		//将一条已完成设置为待办
+		//将一条已完成设置为待办6
 		memoGroup.PUT("/finished/:id", service.OneUpdateToWait)
-		//将所有已完成设置为代办
+		//将所有已完成设置为代办7
 		memoGroup.PUT("/finished/all", service.AllUpdateToWait)
-		//查已完成
-		memoGroup.GET("/finished/all", service.ShowFinishedList)
-		//查未完成
-		memoGroup.GET("/wait/all", service.ShowWaitList)
-		//查所有
+		//查已完成8
+		memoGroup.GET("/search/finished/all", service.ShowFinishedList)
+		//查未完成9
+		memoGroup.GET("/search/wait/all", service.ShowWaitList)
+		//查所有10
 		memoGroup.GET("/all", service.ShowAllList)
-		//根据关键词查＋?keyword=
+		//根据关键词查＋?keyword=11
 		memoGroup.GET("/search", service.ShowByKeyword)
-		//删一条已完成
-		memoGroup.DELETE("/finished/:id", service.DropOne)
-		//删所有已完成、
-		memoGroup.DELETE("/finished/all", service.DropAllFinished)
-		//删一条代办
-		memoGroup.DELETE("/wait/:id", service.DropOne)
-		//删所有待办
-		memoGroup.DELETE("/wait/all", service.DropAllWait)
-		//删所有
-		memoGroup.DELETE("/all", service.DropAllWait, service.DropAllFinished)
+		//删一条已完成12
+		memoGroup.DELETE("/drop/finished/:id", service.DropOne)
+		//删所有已完成、13
+		memoGroup.DELETE("/drop/finished/all", service.DropAllFinished)
+		//删一条代办14
+		memoGroup.DELETE("/drop/wait/:id", service.DropOne)
+		//删所有待办15
+		memoGroup.DELETE("/drop/wait/all", service.DropAllWait)
+		//删所有16
+		memoGroup.DELETE("/drop/all", service.DropAllWait, service.DropAllFinished)
 	}
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(200, gin.H{

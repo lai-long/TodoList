@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"TodoList/config"
+	"TodoList/internal/controlller"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 )
 
 func AuthConfirm(c *gin.Context) {
-	tokenString := c.GetHeader("Authorization")
+	tokenString := controlller.Token
 	if tokenString == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "token is needed"})
 		c.Abort()
