@@ -1,10 +1,10 @@
 package service
 
 import (
+	"TodoList/internal/dao"
 	"TodoList/internal/middleware"
 	"TodoList/internal/model/dto"
 	"TodoList/internal/model/entity"
-	"TodoList/internal/responsibility"
 	"TodoList/pkg/database"
 	"net/http"
 	"strconv"
@@ -24,10 +24,10 @@ func CreateNewList(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
-	todo := responsibility.ExchangeTodo(todoInfo)
+	todo := dao.ExchangeTodo(todoInfo)
 	username := middleware.GetUsername(c)
 	todo.UserName = username
-	if err = responsibility.SaveTodo(todo); err != nil {
+	if err = dao.SaveTodo(todo); err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
 			"message": "fail",
@@ -50,7 +50,7 @@ func ShowAllList(c *gin.Context) {
 	var count int64
 	database.DB.Where("user_name = ? ", username).Count(&count)
 	err = database.DB.Offset(offset).Limit(pagesize).Where("user_name = ? ", username).Find(&todo).Error
-	todoList = responsibility.ExchangeTodoInfos(todo)
+	todoList = dao.ExchangeTodoInfos(todo)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"code":    400,
@@ -74,7 +74,7 @@ func ShowFinishedList(c *gin.Context) {
 	var todoList []dto.TodoList
 	username := middleware.GetUsername(c)
 	err = database.DB.Offset(offset).Limit(pagesize).Where("status=? AND user_name=?", "已完成", username).Find(&todo).Error
-	todoList = responsibility.ExchangeTodoInfos(todo)
+	todoList = dao.ExchangeTodoInfos(todo)
 	var count int64
 	database.DB.Where("user_name = ? ", username).Count(&count)
 	if err != nil {
@@ -100,7 +100,7 @@ func ShowWaitList(c *gin.Context) {
 	var todoList []dto.TodoList
 	username := middleware.GetUsername(c)
 	err = database.DB.Offset(offset).Limit(pagesize).Where("status=? And user_name=?", "未完成", username).Find(&todo).Error
-	todoList = responsibility.ExchangeTodoInfos(todo)
+	todoList = dao.ExchangeTodoInfos(todo)
 	var count int64
 	database.DB.Where("user_name = ? ", username).Count(&count)
 	if err != nil {
@@ -127,7 +127,7 @@ func OneUpdateToFinished(c *gin.Context) {
 	todo.Status = "已完成"
 	username := middleware.GetUsername(c)
 	database.DB.Model(&todo).Where("id=? AND user_name=?", id, username).Updates(todo)
-	todoInfo = responsibility.ExchangeTodoInfo(todo)
+	todoInfo = dao.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
 		"msg":  "success",
@@ -143,7 +143,7 @@ func OneUpdateToWait(c *gin.Context) {
 	todo.Status = "未完成"
 	username := middleware.GetUsername(c)
 	database.DB.Model(&todo).Where("id=? AND user_name=?", id, username).Updates(todo)
-	todoInfo = responsibility.ExchangeTodoInfo(todo)
+	todoInfo = dao.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
 		"msg":  "success",
@@ -161,7 +161,7 @@ func AllUpdateToFinished(c *gin.Context) {
 		todo[i].Model.UpdatedAt = time.Now()
 		todo[i].Status = "已完成"
 		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
-		todoInfo[i] = responsibility.ExchangeTodoInfo(todo[i])
+		todoInfo[i] = dao.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -180,7 +180,7 @@ func AllUpdateToWait(c *gin.Context) {
 		todo[i].Model.UpdatedAt = time.Now()
 		todo[i].Status = "未完成"
 		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
-		todoInfo[i] = responsibility.ExchangeTodoInfo(todo[i])
+		todoInfo[i] = dao.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -201,7 +201,7 @@ func ShowByKeyword(c *gin.Context) {
 	length := len(todo)
 	todoList = make([]dto.TodoList, length)
 	for i := 0; i < length; i++ {
-		todoList[i] = responsibility.ExchangeTodoInfo(todo[i])
+		todoList[i] = dao.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code":  200,

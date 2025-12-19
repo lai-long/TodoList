@@ -1,4 +1,4 @@
-package responsibility
+package dao
 
 import (
 	"TodoList/internal/model/dto"
