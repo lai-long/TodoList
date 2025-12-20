@@ -10,6 +10,7 @@ import (
 
 var DB *gorm.DB
 
+// 初始化数据库
 func InitMysql() (err error) {
 	DB, err = gorm.Open("mysql", config.Dsn)
 	if err != nil {
