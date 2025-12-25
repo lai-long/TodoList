@@ -257,6 +257,20 @@ func DropAllWait(c *gin.Context) {
 		})
 	}
 }
+func DropAllList(c *gin.Context) {
+	username := middleware.GetUsername(c)
+	if err = database.DB.Where("user_name=?", username).Delete(entity.Todo{}).Error; err != nil {
+		c.JSON(400, gin.H{
+			"code":    400,
+			"message": "fail",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "success",
+		})
+	}
+}
 func GetPage(c *gin.Context) (page int, pageSize int) {
 	page, _ = strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ = strconv.Atoi(c.DefaultQuery("pageSize", "10"))

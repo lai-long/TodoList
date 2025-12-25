@@ -45,7 +45,7 @@ func SetRouters(r *gin.Engine) {
 		//删所有待办15
 		memoGroup.DELETE("/drop/wait/all", service.DropAllWait)
 		//删所有16
-		memoGroup.DELETE("/drop/all", service.DropAllWait, service.DropAllFinished)
+		memoGroup.DELETE("/drop/all", service.DropAllList)
 	}
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(200, gin.H{
