@@ -10,9 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var Token string
 var User entity.User
 
 // 注册
@@ -32,9 +32,16 @@ func Register(c *gin.Context) {
 			"count": count})
 		return
 	}
+	//加密密码
+	hasherPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "hashedPassword err",
+		})
+	}
 	//将dto转化为entity
 	User.UserName = req.UserName
-	User.Password = req.Password
+	User.Password = string(hasherPassword)
 	User.Email = req.Email
 	User.Phone = req.Phone
 	User.Address = req.Address
@@ -54,9 +61,10 @@ func Login(c *gin.Context) {
 	}
 	var user entity.User
 	//寻找用户在数据库中的信息
-	result := database.DB.Where("user_name = ? AND password =?", req.UserName, req.Password).First(&user)
+	database.DB.Where("user_name = ?", req.UserName).First(&user)
 	//确认用户是否存在或密码是否正确
-	if result.Error != nil {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "用户名不存在或密码错误"})
 		return
 	}
@@ -75,5 +83,4 @@ func Login(c *gin.Context) {
 	//传输完整token给中间件或前端
 	c.JSON(http.StatusOK, gin.H{"msg": "login success",
 		"token": tokenString})
-	Token = tokenString
 }

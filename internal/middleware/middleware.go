@@ -12,9 +12,7 @@ import (
 // 确认是否成功登录的中间件
 func AuthConfirm(c *gin.Context) {
 	//获取密钥
-	//应该从前端获取，我之前觉得太麻烦所以直接用全局变量存了
 	tokenString := c.Request.Header.Get("Authorization")
-	//tokenString := controlller.Token
 	if tokenString == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "token is needed"})
 		c.Abort()
@@ -35,9 +33,13 @@ func AuthConfirm(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "login err"})
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
-	c.Set("username", claims["username"])
-	c.Next()
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "login err token"})
+	} else {
+		c.Set("username", claims["username"])
+		c.Next()
+	}
 }
 func GetUsername(c *gin.Context) string {
 	username := c.GetString("username")
