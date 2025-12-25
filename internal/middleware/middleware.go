@@ -31,11 +31,15 @@ func AuthConfirm(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "login err"})
+		c.Abort()
+		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "login err token"})
+		c.Abort()
+		return
 	} else {
 		c.Set("username", claims["username"])
 		c.Next()
