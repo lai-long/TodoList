@@ -5,5 +5,6 @@ type TodoList struct {
 	Title    string `json:"title"`
 	Context  string `json:"context"`
 	Status   string `json:"status"`
+	CreateAt string `json:"create_at"`
 	EndDate  string `json:"end_date"`
 }
