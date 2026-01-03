@@ -6,9 +6,16 @@ import (
 	"TodoList/internal/service"
 
 	"github.com/gin-gonic/gin"
+
+	_ "TodoList/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func SetRouters(r *gin.Engine) {
+	//添加swagger路由
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	userGroup := r.Group("/user")
 	{
 		//注册1

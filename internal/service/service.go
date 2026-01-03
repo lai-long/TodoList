@@ -15,6 +15,17 @@ import (
 
 var err error
 
+// CreateNewList godoc
+// @Summary      创建待办事项
+// @Description  创建一条新的待办事项
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body  dto.TodoList  true  "待办事项信息"
+// @Success      200  {object}  map[string]interface{}  "创建成功"
+// @Failure      400  {object}  map[string]interface{}  "创建失败"
+// @Router       /memo/wait/add [post]
 func CreateNewList(c *gin.Context) {
 	var todoInfo dto.TodoList
 	err := c.ShouldBindJSON(&todoInfo)
@@ -41,6 +52,19 @@ func CreateNewList(c *gin.Context) {
 		})
 	}
 }
+
+// ShowAllList godoc
+// @Summary      查询所有待办事项
+// @Description  分页查询所有待办事项（包括已完成和未完成）
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        page      query     int  false  "页码"     default(1)
+// @Param        pageSize  query     int  false  "每页数量" default(10)
+// @Success      200  {object}  map[string]interface{}  "查询成功"
+// @Failure      400  {object}  map[string]interface{}  "查询失败"
+// @Router       /memo/all [get]
 func ShowAllList(c *gin.Context) {
 	offset := GetOffset(c)
 	_, pagesize := GetPage(c)
@@ -67,6 +91,19 @@ func ShowAllList(c *gin.Context) {
 		})
 	}
 }
+
+// ShowFinishedList godoc
+// @Summary      查询已完成事项
+// @Description  分页查询所有已完成事项
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        page      query     int  false  "页码"     default(1)
+// @Param        pageSize  query     int  false  "每页数量" default(10)
+// @Success      200  {object}  map[string]interface{}  "查询成功"
+// @Failure      400  {object}  map[string]interface{}  "查询失败"
+// @Router       /memo/search/finished/all [get]
 func ShowFinishedList(c *gin.Context) {
 	offset := GetOffset(c)
 	_, pagesize := GetPage(c)
@@ -93,6 +130,19 @@ func ShowFinishedList(c *gin.Context) {
 		})
 	}
 }
+
+// ShowWaitList godoc
+// @Summary      查询未完成事项
+// @Description  分页查询所有未完成事项
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        page      query     int  false  "页码"     default(1)
+// @Param        pageSize  query     int  false  "每页数量" default(10)
+// @Success      200  {object}  map[string]interface{}  "查询成功"
+// @Failure      400  {object}  map[string]interface{}  "查询失败"
+// @Router       /memo/search/wait/all [get]
 func ShowWaitList(c *gin.Context) {
 	offset := GetOffset(c)
 	_, pagesize := GetPage(c)
@@ -119,6 +169,18 @@ func ShowWaitList(c *gin.Context) {
 		})
 	}
 }
+
+// OneUpdateToFinished godoc
+// @Summary      将一条待办设置为已完成
+// @Description  根据ID将单条待办事项标记为已完成
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path  string  true  "待办事项ID"
+// @Success      200  {object}  map[string]interface{}  "更新成功"
+// @Failure      400  {object}  map[string]interface{}  "更新失败"
+// @Router       /memo/wait/{id} [put]
 func OneUpdateToFinished(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -135,6 +197,18 @@ func OneUpdateToFinished(c *gin.Context) {
 	})
 
 }
+
+// OneUpdateToWait godoc
+// @Summary      将一条已完成设置为待办
+// @Description  根据ID将单条已完成事项标记为待办
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path  string  true  "待办事项ID"
+// @Success      200  {object}  map[string]interface{}  "更新成功"
+// @Failure      400  {object}  map[string]interface{}  "更新失败"
+// @Router       /memo/finished/{id} [put]
 func OneUpdateToWait(c *gin.Context) {
 	id := c.Params.ByName("id")
 	var todoInfo dto.TodoList
@@ -150,6 +224,17 @@ func OneUpdateToWait(c *gin.Context) {
 		"data": todoInfo.Status,
 	})
 }
+
+// AllUpdateToFinished godoc
+// @Summary      将所有待办设置为已完成
+// @Description  将所有未完成事项批量标记为已完成
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "更新成功"
+// @Failure      400  {object}  map[string]interface{}  "更新失败"
+// @Router       /memo/wait/all [put]
 func AllUpdateToFinished(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
@@ -169,6 +254,17 @@ func AllUpdateToFinished(c *gin.Context) {
 		"data": todoInfo,
 	})
 }
+
+// AllUpdateToWait godoc
+// @Summary      将所有已完成设置为待办
+// @Description  将所有已完成事项批量标记为待办
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "更新成功"
+// @Failure      400  {object}  map[string]interface{}  "更新失败"
+// @Router       /memo/finished/all [put]
 func AllUpdateToWait(c *gin.Context) {
 	var todo []entity.Todo
 	var todoInfo []dto.TodoList
@@ -188,6 +284,20 @@ func AllUpdateToWait(c *gin.Context) {
 		"data": todoInfo,
 	})
 }
+
+// ShowByKeyword godoc
+// @Summary      关键词搜索待办事项
+// @Description  根据关键词搜索待办事项（标题或内容模糊匹配）
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        keyword   query     string  true   "搜索关键词"
+// @Param        page      query     int     false  "页码"     default(1)
+// @Param        pageSize  query     int     false  "每页数量" default(10)
+// @Success      200  {object}  map[string]interface{}  "查询成功"
+// @Failure      400  {object}  map[string]interface{}  "查询失败"
+// @Router       /memo/search [get]
 func ShowByKeyword(c *gin.Context) {
 	offset := GetOffset(c)
 	_, pagesize := GetPage(c)
@@ -211,6 +321,19 @@ func ShowByKeyword(c *gin.Context) {
 		"page":  1 + offset,
 	})
 }
+
+// DropOne godoc
+// @Summary      删除单条待办事项
+// @Description  根据ID删除单条待办事项（无论是已完成还是未完成）
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path  string  true  "待办事项ID"
+// @Success      200  {object}  map[string]interface{}  "删除成功"
+// @Failure      400  {object}  map[string]interface{}  "删除失败"
+// @Router       /memo/drop/wait/{id} [delete]
+// @Router       /memo/drop/finished/{id} [delete]
 func DropOne(c *gin.Context) {
 	username := middleware.GetUsername(c)
 	id := c.Params.ByName("id")
@@ -227,6 +350,17 @@ func DropOne(c *gin.Context) {
 		})
 	}
 }
+
+// DropAllFinished godoc
+// @Summary      删除所有已完成事项
+// @Description  批量删除所有已完成事项
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "删除成功"
+// @Failure      400  {object}  map[string]interface{}  "删除失败"
+// @Router       /memo/drop/finished/all [delete]
 func DropAllFinished(c *gin.Context) {
 	username := middleware.GetUsername(c)
 	if err = database.DB.Where("status = ? AND user_name=?", "已完成", username).Delete(entity.Todo{}).Error; err != nil {
@@ -242,6 +376,17 @@ func DropAllFinished(c *gin.Context) {
 		})
 	}
 }
+
+// DropAllWait godoc
+// @Summary      删除所有待办事项
+// @Description  批量删除所有待办（未完成）事项
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "删除成功"
+// @Failure      400  {object}  map[string]interface{}  "删除失败"
+// @Router       /memo/drop/wait/all [delete]
 func DropAllWait(c *gin.Context) {
 	username := middleware.GetUsername(c)
 	if err = database.DB.Where("status = ? AND user_name=?", "未完成", username).Delete(entity.Todo{}).Error; err != nil {
@@ -257,6 +402,17 @@ func DropAllWait(c *gin.Context) {
 		})
 	}
 }
+
+// DropAllList godoc
+// @Summary      删除所有事项
+// @Description  删除用户的所有待办事项（包括已完成和未完成）
+// @Tags         待办事项模块
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "删除成功"
+// @Failure      400  {object}  map[string]interface{}  "删除失败"
+// @Router       /memo/drop/all [delete]
 func DropAllList(c *gin.Context) {
 	username := middleware.GetUsername(c)
 	if err = database.DB.Where("user_name=?", username).Delete(entity.Todo{}).Error; err != nil {
@@ -271,11 +427,25 @@ func DropAllList(c *gin.Context) {
 		})
 	}
 }
+
+// GetPage godoc
+// @Summary      获取分页参数
+// @Description  从查询参数中获取页码和每页数量
+// @Param        page      query  int  false  "页码"     default(1)
+// @Param        pageSize  query  int  false  "每页数量" default(10)
+// @return       page int, pageSize int
 func GetPage(c *gin.Context) (page int, pageSize int) {
 	page, _ = strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ = strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	return page, pageSize
 }
+
+// GetOffset godoc
+// @Summary      计算偏移量
+// @Description  根据页码和每页数量计算数据库查询偏移量
+// @Param        page      query  int  false  "页码"     default(1)
+// @Param        pageSize  query  int  false  "每页数量" default(10)
+// @return       offset int
 func GetOffset(c *gin.Context) int {
 	page, pageSize := GetPage(c)
 	offset := (page - 1) * pageSize

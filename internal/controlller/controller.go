@@ -15,7 +15,16 @@ import (
 
 var User entity.User
 
-// 注册
+// Register godoc
+// @Summary      用户注册
+// @Description  新用户注册接口
+// @Tags         用户模块
+// @Accept       json
+// @Produce      json
+// @Param        request  body  dto.UserInfo  true  "用户注册信息"
+// @Success      200  {object}  map[string]interface{}  "注册成功"
+// @Failure      400  {object}  map[string]interface{}  "注册失败"
+// @Router       /user/register [post]
 func Register(c *gin.Context) {
 	var req dto.UserInfo
 	//获取前端数据
@@ -50,7 +59,16 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "register success"})
 }
 
-// 登录
+// Login godoc
+// @Summary      用户登录
+// @Description  用户登录接口，返回JWT令牌
+// @Tags         用户模块
+// @Accept       json
+// @Produce      json
+// @Param        request  body  dto.UserInfo  true  "用户登录信息"
+// @Success      200  {object}  map[string]interface{}  "登录成功，返回token"
+// @Failure      400  {object}  map[string]interface{}  "登录失败"
+// @Router       /user/login [post]
 func Login(c *gin.Context) {
 	//获取前端数据
 	var req dto.UserInfo

@@ -9,6 +9,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+//@title TodoList API
+//@version 1.0
+//@description API
+
+// @host 127.0.0.1/:8080
 func main() {
 	//连接数据库
 	err := database.InitMysql()
