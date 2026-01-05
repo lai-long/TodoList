@@ -188,7 +188,7 @@ func OneUpdateToFinished(c *gin.Context) {
 	todo.Model.UpdatedAt = time.Now()
 	todo.Status = "已完成"
 	username := middleware.GetUsername(c)
-	database.DB.Model(&todo).Where("id=? AND user_name=?", id, username).Updates(todo)
+	database.DB.Model(&entity.Todo{}).Where("id=? AND user_name=?", id, username).Updates(todo)
 	todoInfo = dao.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -216,7 +216,7 @@ func OneUpdateToWait(c *gin.Context) {
 	todo.Model.UpdatedAt = time.Now()
 	todo.Status = "未完成"
 	username := middleware.GetUsername(c)
-	database.DB.Model(&todo).Where("id=? AND user_name=?", id, username).Updates(todo)
+	database.DB.Model(&entity.Todo{}).Where("id=? AND user_name=?", id, username).Updates(todo)
 	todoInfo = dao.ExchangeTodoInfo(todo)
 	c.JSON(200, gin.H{
 		"code": 200,
@@ -245,7 +245,7 @@ func AllUpdateToFinished(c *gin.Context) {
 	for i := 0; i < length; i++ {
 		todo[i].Model.UpdatedAt = time.Now()
 		todo[i].Status = "已完成"
-		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
+		database.DB.Model(&entity.Todo{}).Where("id=?", todo[i].Model.ID).Updates(todo[i])
 		todoInfo[i] = dao.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(200, gin.H{
@@ -275,7 +275,7 @@ func AllUpdateToWait(c *gin.Context) {
 	for i := 0; i < length; i++ {
 		todo[i].Model.UpdatedAt = time.Now()
 		todo[i].Status = "未完成"
-		database.DB.Model(&todo).Where("id=?", todo[i].Model.ID).Updates(todo[i])
+		database.DB.Model(&entity.Todo{}).Where("id=?", todo[i].Model.ID).Updates(todo[i])
 		todoInfo[i] = dao.ExchangeTodoInfo(todo[i])
 	}
 	c.JSON(200, gin.H{
