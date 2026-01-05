@@ -19,7 +19,7 @@ func AuthConfirm(c *gin.Context) {
 		return
 	}
 	//删除token前面的Bearer
-	if len(tokenString) > 7 && tokenString[:7] == "Bearer" {
+	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
 		tokenString = tokenString[7:]
 	}
 	//验证token是否正确，若正确返回密钥
